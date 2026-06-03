@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+/* Class-based dark mode untuk Tailwind v4 */
+@variant dark (&:where(.dark, .dark *));
+
+/* ---- Light mode (default) ---- */
+:root {
+  --bg:        #f4f4f5;
+  --surface:   #ffffff;
+  --surface-2: #f4f4f5;
+  --border:    #e4e4e7;
+  --text:      #09090b;
+  --text-muted:#71717a;
+}
+
+/* ---- Dark mode ---- */
+.dark {
+  --bg:        #09090b;
+  --surface:   #18181b;
+  --surface-2: #27272a;
+  --border:    #27272a;
+  --text:      #fafafa;
+  --text-muted:#71717a;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-geist), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card glow hover */
+.card-glow {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.card-glow:hover {
+  box-shadow: 0 0 0 1px #10b98130, 0 4px 24px #10b98115;
+  border-color: #10b98150 !important;
+}
+
+/* Grid background */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.dark .bg-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+}
+
+/* Fade-up animation */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.5s ease forwards;
+}
