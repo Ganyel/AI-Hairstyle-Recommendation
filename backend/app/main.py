@@ -12,9 +12,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Support multiple frontend URLs (local + production)
+raw_origins = os.getenv("FRONTEND_URL", "http://localhost:3000")
+origins = [o.strip() for o in raw_origins.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[os.getenv("FRONTEND_URL", "http://localhost:3000")],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

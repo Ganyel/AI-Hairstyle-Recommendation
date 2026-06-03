@@ -19,10 +19,13 @@ frontend/out/
 # Build
 frontend/build/
 
-# ML Models (besar, simpan di cloud storage)
-backend/ml_models/*.h5
-backend/ml_models/*.pt
-backend/ml_models/*.pkl
+# ML Models — uncommit baris di bawah jika ingin exclude dari git
+# backend/ml_models/*.h5
+# backend/ml_models/*.pt
+# backend/ml_models/*.pkl
+
+# Dataset (jangan push ke git)
+dataset/
 
 # Uploads (file sementara dari user)
 backend/uploads/*
