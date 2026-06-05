@@ -12,13 +12,17 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Support multiple frontend URLs (local + production)
 raw_origins = os.getenv("FRONTEND_URL", "http://localhost:3000")
-origins = [o.strip() for o in raw_origins.split(",")]
+
+# Jika diset ke "*", izinkan semua origin
+if raw_origins.strip() == "*":
+    allow_origins = ["*"]
+else:
+    allow_origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
