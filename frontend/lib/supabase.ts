@@ -1,19 +1,15 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-// Lazy init — hindari crash saat build time jika env vars belum ada
 let _client: SupabaseClient | null = null;
 
-function getClient(): SupabaseClient {
-  if (!_client) {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!url || !key) throw new Error("Supabase env vars tidak ditemukan.");
-    _client = createClient(url, key);
-  }
+function getSupabase(): SupabaseClient {
+  if (_client) return _client;
+  // NEXT_PUBLIC_ vars sudah di-bake saat build oleh Next.js
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+  _client = createClient(url, key);
   return _client;
 }
-
-export const supabase = { from: (table: string) => getClient().from(table) };
 
 export interface HistoryRecord {
   id: string;
@@ -30,26 +26,27 @@ export async function saveHistory(
   confidence: number,
   hairstyles: HistoryRecord["hairstyles"]
 ): Promise<void> {
-  await supabase.from("recommendations").insert({ name, face_shape, confidence, hairstyles });
+  const { error } = await getSupabase()
+    .from("recommendations")
+    .insert({ name, face_shape, confidence, hairstyles });
+  if (error) console.error("saveHistory error:", error.message);
 }
 
 export async function fetchHistory(): Promise<HistoryRecord[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("recommendations")
     .select("*")
     .order("created_at", { ascending: false })
     .limit(50);
-
   if (error) throw new Error(error.message);
   return data ?? [];
 }
 
 export async function fetchAllHistory(): Promise<HistoryRecord[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("recommendations")
     .select("*")
     .order("created_at", { ascending: false });
-
   if (error) throw new Error(error.message);
   return data ?? [];
 }
@@ -62,19 +59,17 @@ export interface AdminStats {
 }
 
 export async function fetchAdminStats(): Promise<AdminStats> {
-  const { data, error } = await supabase.from("recommendations").select("*");
+  const { data, error } = await getSupabase().from("recommendations").select("*");
   if (error) throw new Error(error.message);
   const records: HistoryRecord[] = data ?? [];
 
   const todayStr = new Date().toISOString().slice(0, 10);
   const today = records.filter((r) => r.created_at.startsWith(todayStr)).length;
 
-  // Bentuk wajah terbanyak
   const shapeCounts: Record<string, number> = {};
   records.forEach((r) => { shapeCounts[r.face_shape] = (shapeCounts[r.face_shape] ?? 0) + 1; });
   const topFaceShape = Object.entries(shapeCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "-";
 
-  // Gaya rambut #1 terpopuler
   const hairstyleCounts: Record<string, number> = {};
   records.forEach((r) => {
     const top = r.hairstyles[0]?.name;
@@ -86,6 +81,6 @@ export async function fetchAdminStats(): Promise<AdminStats> {
 }
 
 export async function deleteRecord(id: string): Promise<void> {
-  const { error } = await supabase.from("recommendations").delete().eq("id", id);
+  const { error } = await getSupabase().from("recommendations").delete().eq("id", id);
   if (error) throw new Error(error.message);
 }
