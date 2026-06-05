@@ -1,6 +1,8 @@
-export function Skeleton({ className = "" }: { className?: string }) {
+import React from "react";
+
+export function Skeleton({ className = "", style }: { className?: string; style?: React.CSSProperties }) {
   return (
-    <div className={`animate-pulse bg-zinc-800 rounded-lg ${className}`} />
+    <div className={`animate-pulse bg-zinc-800 rounded-lg ${className}`} style={style} />
   );
 }
 
