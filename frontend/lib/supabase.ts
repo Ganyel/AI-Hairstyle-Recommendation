@@ -1,9 +1,19 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// Lazy init — hindari crash saat build time jika env vars belum ada
+let _client: SupabaseClient | null = null;
 
-export const supabase = createClient(url, key);
+function getClient(): SupabaseClient {
+  if (!_client) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) throw new Error("Supabase env vars tidak ditemukan.");
+    _client = createClient(url, key);
+  }
+  return _client;
+}
+
+export const supabase = { from: (table: string) => getClient().from(table) };
 
 export interface HistoryRecord {
   id: string;
