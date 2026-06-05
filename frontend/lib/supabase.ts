@@ -1,13 +1,19 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
+// Fallback hardcoded — anon key aman dipublikasi, keamanan dijaga RLS Supabase
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  "https://uuhhjsvurtgfzavxswzk.supabase.co";
+
+const SUPABASE_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1aGhqc3Z1cnRnZnphdnhzd3prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTY1MzMsImV4cCI6MjA5NjA3MjUzM30.ly9pLynfaybh8SkK6ELFvN5nxioWmcfVaE44VYaqyFw";
+
 let _client: SupabaseClient | null = null;
 
 function getSupabase(): SupabaseClient {
   if (_client) return _client;
-  // NEXT_PUBLIC_ vars sudah di-bake saat build oleh Next.js
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
-  _client = createClient(url, key);
+  _client = createClient(SUPABASE_URL, SUPABASE_KEY);
   return _client;
 }
 
